@@ -165,5 +165,61 @@ namespace DotNet.Core
             yield return package.z7;
             yield return package.z8;
         }
+
+        public static Box AsBox(this PointPackage pkg)
+		{
+            var minX = pkg.GetValuesForX().Min();
+            var minY = pkg.GetValuesForY().Min();
+            var minZ = pkg.GetValuesForZ().Min();
+            
+            var maxX = pkg.GetValuesForX().Max();
+            var maxY = pkg.GetValuesForY().Max();
+            var maxZ = pkg.GetValuesForZ().Max();
+
+            var minPoint = new Point3D
+            {
+                X = minX,
+                Y = minY,
+                Z = minZ,
+            };
+
+            var maxPoint = new Point3D
+            {
+                X = maxX,
+                Y = maxY,
+                Z = maxZ,
+            };
+
+            var box = new Box
+            {
+                A = minPoint,
+                B = maxPoint,
+            };
+            return box;
+		}
+
+        public static Box AsBox(this Vehicle vehicle)
+        {
+            var minPoint = new Point3D
+            {
+                X = 0,
+                Y = 0,
+                Z = 0,
+            };
+
+            var maxPoint = new Point3D
+            {
+                X = vehicle.Width,
+                Y = vehicle.Length,
+                Z = vehicle.Height,
+            };
+
+            var box = new Box
+            {
+                A = minPoint,
+                B = maxPoint,
+            };
+            return box;
+        }
     }
 }

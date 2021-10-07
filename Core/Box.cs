@@ -2,7 +2,7 @@
 {
 	public class Box
 	{
-		public Point3D A { get; set; }
-		public Point3D B { get; set; }
+		public Point3D Min { get; set; }
+		public Point3D Max { get; set; }
 	}
 }

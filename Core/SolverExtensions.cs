@@ -176,14 +176,14 @@ namespace DotNet.Core
             var maxY = pkg.GetValuesForY().Max();
             var maxZ = pkg.GetValuesForZ().Max();
 
-            var minPoint = new Point3D
+            var min = new Point3D
             {
                 X = minX,
                 Y = minY,
                 Z = minZ,
             };
 
-            var maxPoint = new Point3D
+            var max = new Point3D
             {
                 X = maxX,
                 Y = maxY,
@@ -192,22 +192,22 @@ namespace DotNet.Core
 
             var box = new Box
             {
-                A = minPoint,
-                B = maxPoint,
+                Min = min,
+                Max = max,
             };
             return box;
 		}
 
         public static Box AsBox(this Vehicle vehicle)
         {
-            var minPoint = new Point3D
+            var min = new Point3D
             {
                 X = 0,
                 Y = 0,
                 Z = 0,
             };
 
-            var maxPoint = new Point3D
+            var max = new Point3D
             {
                 X = vehicle.Width,
                 Y = vehicle.Length,
@@ -216,10 +216,19 @@ namespace DotNet.Core
 
             var box = new Box
             {
-                A = minPoint,
-                B = maxPoint,
+                Min = min,
+                Max = max,
             };
             return box;
         }
+
+        public static bool IntersectsWith(this Box a, Box b)
+		{
+            var iX = a.Min.X <= b.Max.X && a.Max.X >= b.Min.X;
+            var iY = a.Min.Y <= b.Max.Y && a.Max.Y >= b.Min.Y;
+            var iZ = a.Min.Z <= b.Max.Z && a.Max.Z >= b.Min.Z;
+            var result = iX && iY && iZ;
+            return result;
+		}
     }
 }

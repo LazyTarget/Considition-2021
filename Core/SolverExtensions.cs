@@ -17,6 +17,7 @@ namespace DotNet.Core
         /// <returns></returns>
 		public static bool ValidateTruckPosition(this Vehicle vehicle, PointPackage pkg)
 		{
+
             throw new NotImplementedException();
         }
 
@@ -32,23 +33,23 @@ namespace DotNet.Core
                 return false;
 
 
-            bool DoesPackageFitX(Package package)
-            {
-                return (_xp + _lastKnownMaxLength + package.Length < _truckX);
-            }
+            //bool DoesPackageFitX(Package package)
+            //{
+            //    return (_xp + _lastKnownMaxLength + package.Length < _truckX);
+            //}
 
-            bool DoesPackageFitY(Package package)
-            {
-                return (_yp + _lastKnownMaxWidth + package.Width < _truckY &
-                        _xp + package.Length < _truckX);
-            }
+            //bool DoesPackageFitY(Package package)
+            //{
+            //    return (_yp + _lastKnownMaxWidth + package.Width < _truckY &
+            //            _xp + package.Length < _truckX);
+            //}
 
-            bool DoesPackageFitZ(Package package)
-            {
-                return (_xp + package.Length < _truckX &
-                        _yp + package.Width < _truckY &
-                        _zp + package.Height < _truckZ);
-            }
+            //bool DoesPackageFitZ(Package package)
+            //{
+            //    return (_xp + package.Length < _truckX &
+            //            _yp + package.Width < _truckY &
+            //            _zp + package.Height < _truckZ);
+            //}
 
 
             throw new NotImplementedException();

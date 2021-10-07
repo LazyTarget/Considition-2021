@@ -7,7 +7,7 @@ namespace DotNet
 {
 	public class LazySolver : SolverBase
 	{
-		public override PointPackage GetNext(GameResponse game, List<PointPackage> state)
+		public override PointPackage GetNext(GameState state)
 		{
 			throw new NotImplementedException();
 		}

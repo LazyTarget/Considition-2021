@@ -1,5 +1,6 @@
 ﻿
 using System;
+using System.Diagnostics;
 using System.Linq;
 using System.Text.Json;
 using System.Xml;
@@ -18,15 +19,27 @@ namespace DotNet
             var GameLayer = new GameLayer(apiKey);
 
             var gameInformation = GameLayer.NewGame(map);
-            var solver = new RandomSolver(gameInformation.Dimensions, gameInformation.Vehicle);
-            var solution = solver.Solve();
-            var submitSolution = GameLayer.Submit(JsonSerializer.Serialize(solution), map);
-           
-            Console.WriteLine("Your GameId is: " + submitSolution.GameId);
-            Console.WriteLine("Your score is: " + submitSolution.Score);
-            Console.WriteLine("Link to visualisation" + submitSolution.Link);
-            Console.WriteLine("..for map: " + map);
+            Debug.WriteLine("Vehicle: " + JsonSerializer.Serialize(gameInformation.Vehicle));
+            Debug.WriteLine("Dimensions: " + JsonSerializer.Serialize(gameInformation.Dimensions));
 
+			try
+			{
+                var solver = new RandomSolver(gameInformation.Dimensions, gameInformation.Vehicle);
+                var solution = solver.Solve();
+                var submitSolution = GameLayer.Submit(JsonSerializer.Serialize(solution), map);
+
+                Console.WriteLine("Your GameId is: " + submitSolution.GameId);
+                Console.WriteLine("Your score is: " + submitSolution.Score);
+                Console.WriteLine("Link to visualisation" + submitSolution.Link);
+                Console.WriteLine("..for map: " + map);
+            }
+            catch (Exception ex)
+			{
+                Console.WriteLine($"Error: {ex}");
+			}
+
+            Console.WriteLine("Press [Enter] to exit");
+            Console.ReadLine();
         }
     }
 }

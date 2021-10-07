@@ -74,19 +74,28 @@ namespace DotNet.Core
 		}
 
 
-        public static IEnumerable<Package> GetRemainingPackages(this GameState state)
+        public static IEnumerable<Package> GetRemainingPackages(this GameState state, Func<Package, object> orderBy = null, Func<Package, object> thenBy = null)
         {
-            for (var i = 0; i < state.Game.Dimensions.Count; i++)
+            var list = state.Game.Dimensions;
+            if (orderBy != null)
+			{
+                var o = list.OrderBy(orderBy);
+                if (thenBy != null)
+                    o = o.ThenBy(thenBy);
+                list = o.ToList();
+            }
+
+            for (var i = 0; i < list.Count; i++)
             {
-                var pkg = state.Game.Dimensions.ElementAtOrDefault(i);
-                if (pkg == null)
+                var package = list.ElementAtOrDefault(i);
+                if (package == null)
                     break;
 
-                var isLoaded = state.Solution.Any(x => x.Id == pkg.Id);
+                var isLoaded = state.Solution.Any(x => x.Id == package.Id);
                 if (isLoaded)
                     continue;
 
-                yield return pkg;
+                yield return package;
             }
         }
 
@@ -161,6 +170,7 @@ namespace DotNet.Core
             yield return package.z8;
         }
 
+
         public static Box AsBox(this PointPackage pkg)
 		{
             var minX = pkg.GetValuesForX().Min();
@@ -192,6 +202,30 @@ namespace DotNet.Core
             };
             return box;
 		}
+
+        public static Box AsBox(this Package pkg)
+        {
+            var min = new Point3D
+            {
+                X = 0,
+                Y = 0,
+                Z = 0,
+            };
+
+            var max = new Point3D
+            {
+                X = pkg.Width,
+                Y = pkg.Length,
+                Z = pkg.Height,
+            };
+
+            var box = new Box
+            {
+                Min = min,
+                Max = max,
+            };
+            return box;
+        }
 
         public static Box AsBox(this Vehicle vehicle)
         {
@@ -225,5 +259,13 @@ namespace DotNet.Core
             var result = iX && iY && iZ;
             return result;
 		}
+
+        public static bool IntersectsWith(this PointPackage a, PointPackage b)
+        {
+            var boxA = a.AsBox();
+            var boxB = b.AsBox();
+            var result = boxA.IntersectsWith(boxB);
+            return result;
+        }
     }
 }

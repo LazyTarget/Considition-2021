@@ -29,6 +29,8 @@ namespace DotNet.Core
 					throw new ApplicationException("Package already added to solution!");
 				}
 
+				// todo: validate that the package is placed on the floor or on another package...
+
 				solution.Add(pkg);
 			}
 			return solution;

@@ -57,7 +57,7 @@ namespace DotNet.Core
         /// </summary>
         /// <param name="state"></param>
         /// <returns></returns>
-        public static bool IsCollisionFree(this GameState state, PointPackage pkg)
+        public static bool IsValidPlacement(this GameState state, PointPackage pkg)
 		{
             var invalid = ValidateTruckPosition(state.Vehicle, pkg);
             if (!invalid)

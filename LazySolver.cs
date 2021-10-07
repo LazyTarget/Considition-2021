@@ -53,7 +53,7 @@ namespace DotNet
 				};
 
 			// Validate
-			alternatives = alternatives.Where(p => state.IsCollisionFree(p)).ToArray();
+			alternatives = alternatives.Where(p => state.IsValidPlacement(p)).ToArray();
 
 			// todo: randomize order?
 
@@ -69,13 +69,33 @@ namespace DotNet
 			}
 			else
 			{
+				Console.WriteLine("Could not find target (greedy)");
 				return null;
 			}
 		}
 
 		private PointPackage GetNext_Exhaustive(Package pkg, GameState state)
 		{
+			var maxX = state.Vehicle.Width - pkg.Width;
+			var maxY = state.Vehicle.Length - pkg.Length;
+			var maxZ = state.Vehicle.Height - pkg.Height;
 
+			for (var y = 0; y < maxY; y++)
+			{
+				for (var x = 0; x < maxX; x++)
+				{
+					for (var z = 0; z < maxZ; z++)
+					{
+						var target = pkg.Place(x, y, z);
+						var valid = state.IsValidPlacement(target);
+						if (valid)
+							return target;
+					}
+				}
+			}
+
+			Console.WriteLine("Could not find target (exhaustive)");
+			return null;
 		}
 	}
 }

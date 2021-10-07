@@ -14,16 +14,31 @@ namespace DotNet
 			var query = state.GetRemainingPackages(x => 0 - x.WeightClass, x => 0 - (x.Width * x.Length * x.Height)).ToList();
 			foreach (var pkg in query)
 			{
-				var prev = _previous?.AsBox() ?? new Box();
+				var greedy = GetNext_Greedy(pkg, state);
+				if (greedy != null)
+					return greedy;
 
-				var aboveLast = pkg.Place(prev.Min.X+1, prev.Min.Y, prev.Max.Z);
-				var rightOfLast = pkg.Place(prev.Max.X+1, prev.Min.Y, prev.Min.Z);
-				var leftMostOfLastOnNextRow = pkg.Place(0, prev.Max.Y +1, prev.Min.Z);
-				var inFrontOfLast = pkg.Place(prev.Min.X, prev.Max.Y +1, prev.Min.Z);
+				var ex = GetNext_Exhaustive(pkg, state);
+				if (ex != null)
+					return ex;
+			}
+
+			Console.WriteLine("SOMETHING WENT TERRIBLY WRONG!! ABORT MISSION");
+			return null;
+		}
+
+		private PointPackage GetNext_Greedy(Package pkg, GameState state)
+		{
+			var prev = _previous?.AsBox() ?? new Box();
+
+			var aboveLast = pkg.Place(prev.Min.X + 1, prev.Min.Y, prev.Max.Z);
+			var rightOfLast = pkg.Place(prev.Max.X + 1, prev.Min.Y, prev.Min.Z);
+			var leftMostOfLastOnNextRow = pkg.Place(0, prev.Max.Y + 1, prev.Min.Z);
+			var inFrontOfLast = pkg.Place(prev.Min.X, prev.Max.Y + 1, prev.Min.Z);
 
 
-				var alternatives = new[]
-				{
+			var alternatives = new[]
+			{
 					//pkg.Place(_xStart, _yStart, _zStart),
 					//pkg.Place(_xStart, _yEnd, _zEnd),
 					//pkg.Place(_xEnd, _yStart, _zStart),
@@ -37,25 +52,30 @@ namespace DotNet
 					inFrontOfLast,
 				};
 
-				// Validate
-				alternatives = alternatives.Where(p => state.IsCollisionFree(p)).ToArray();
+			// Validate
+			alternatives = alternatives.Where(p => state.IsCollisionFree(p)).ToArray();
 
-				// todo: randomize order?
+			// todo: randomize order?
 
-				// todo: prioritize weight at bottom
+			// todo: prioritize weight at bottom
 
-				// todo: prioritize OrderClass (for last packages)
+			// todo: prioritize OrderClass (for last packages)
 
-				var chosen = alternatives.FirstOrDefault();
-				if (chosen != null)
-				{
-					_previous = chosen;
-					return chosen;
-				}
+			var chosen = alternatives.FirstOrDefault();
+			if (chosen != null)
+			{
+				_previous = chosen;
+				return chosen;
 			}
+			else
+			{
+				return null;
+			}
+		}
 
-			Console.WriteLine("SOMETHING WENT TERRIBLY WRONG!! ABORT MISSION");
-			return null;
+		private PointPackage GetNext_Exhaustive(Package pkg, GameState state)
+		{
+
 		}
 	}
 }

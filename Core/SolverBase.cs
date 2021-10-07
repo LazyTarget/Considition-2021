@@ -7,6 +7,8 @@ namespace DotNet.Core
 {
 	public abstract class SolverBase : ISolver
 	{
+		public static Random Random = new Random();
+
 		public virtual List<PointPackage> Solve(GameResponse game)
 		{
 			var solution = new List<PointPackage>();

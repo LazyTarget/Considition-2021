@@ -24,8 +24,8 @@ namespace DotNet
 
 			try
 			{
-                var solver = new RandomSolver(gameInformation.Dimensions, gameInformation.Vehicle);
-                var solution = solver.Solve();
+                var solver = new LazySolver();
+                var solution = solver.Solve(gameInformation);
                 var submitSolution = GameLayer.Submit(JsonSerializer.Serialize(solution), map);
 
                 Console.WriteLine("Your GameId is: " + submitSolution.GameId);

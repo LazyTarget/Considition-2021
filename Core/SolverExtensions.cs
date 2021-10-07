@@ -41,6 +41,14 @@ namespace DotNet.Core
                 return false;
 
 
+            var intersectsWithVehicle = vehicle.AsBox().IntersectsWith(pkg.AsBox());
+            var intersectsWithVehicle2 = pkg.AsBox().IntersectsWith(vehicle.AsBox());
+            if (intersectsWithVehicle != intersectsWithVehicle2)
+                throw new Exception("These should be equivalent?");
+
+            if (!intersectsWithVehicle)
+                return false;       // Package doesn't intersect with Vehicle, but it should!
+
             return true;
         }
 
@@ -55,25 +63,12 @@ namespace DotNet.Core
             if (!invalid)
                 return false;
 
-
-            //bool DoesPackageFitX(Package package)
-            //{
-            //    return (_xp + _lastKnownMaxLength + package.Length < _truckX);
-            //}
-
-            //bool DoesPackageFitY(Package package)
-            //{
-            //    return (_yp + _lastKnownMaxWidth + package.Width < _truckY &
-            //            _xp + package.Length < _truckX);
-            //}
-
-            //bool DoesPackageFitZ(Package package)
-            //{
-            //    return (_xp + package.Length < _truckX &
-            //            _yp + package.Width < _truckY &
-            //            _zp + package.Height < _truckZ);
-            //}
-
+            var intersectedPackages = state.Solution.Where(p => p.AsBox().IntersectsWith(pkg.AsBox())).ToArray();
+            if (intersectedPackages.Any())
+			{
+                // Collides with one ore more packages
+                return false;
+			}
 
             return true;
 		}

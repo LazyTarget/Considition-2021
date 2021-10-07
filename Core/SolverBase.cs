@@ -10,9 +10,14 @@ namespace DotNet.Core
 		public virtual List<PointPackage> Solve(GameResponse game)
 		{
 			var solution = new List<PointPackage>();
+			var state = new GameState
+			{
+				Game = game,
+				Solution = solution,
+			};
 			while (solution.Count != game.Dimensions.Count)
 			{
-				var pkg = GetNext(game, solution);
+				var pkg = GetNext(state);
 				if (pkg == null)
 				{
 					throw new ApplicationException("Missing next package!");
@@ -27,6 +32,6 @@ namespace DotNet.Core
 			return solution;
 		}
 
-		public abstract PointPackage GetNext(GameResponse game, List<PointPackage> state);
+		public abstract PointPackage GetNext(GameState state);
 	}
 }

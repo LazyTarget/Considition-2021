@@ -9,6 +9,8 @@ namespace DotNet.Core
 	{
 		public static Random Random = new Random();
 
+		protected readonly IList<PointPackage> History = new List<PointPackage>();
+
 		public virtual List<PointPackage> Solve(GameResponse game)
 		{
 			var solution = new List<PointPackage>();
@@ -31,6 +33,7 @@ namespace DotNet.Core
 
 				// todo: validate that the package is placed on the floor or on another package...
 
+				History.Add(pkg);
 				solution.Add(pkg);
 			}
 			return solution;

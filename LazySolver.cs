@@ -1,4 +1,4 @@
-﻿using DotNet.Core;
+using DotNet.Core;
 using DotNet.models;
 using System;
 using System.Linq;
@@ -76,6 +76,7 @@ namespace DotNet
 
 		private PointPackage GetNext_Exhaustive(Package pkg, GameState state)
 		{
+			Console.WriteLine($"GetNext_Exhaustive Package={pkg}");
 			var maxX = state.Vehicle.Width - pkg.Width;
 			var maxY = state.Vehicle.Length - pkg.Length;
 			var maxZ = state.Vehicle.Height - pkg.Height;

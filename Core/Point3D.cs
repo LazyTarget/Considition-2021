@@ -17,5 +17,10 @@
 		{
 			return new Point3D(a.X + b.X, a.Y + b.Y, a.Z + b.Z);
 		}
+
+		public override string ToString()
+		{
+			return $"{{ {X}, {Y}, {Z} }}";
+		}
 	}
 }

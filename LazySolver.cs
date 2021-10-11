@@ -1,4 +1,4 @@
-using DotNet.Core;
+﻿using DotNet.Core;
 using DotNet.models;
 using System;
 using System.Linq;
@@ -18,9 +18,18 @@ namespace DotNet
 				if (greedy != null)
 					return greedy;
 
-				var ex = GetNext_Exhaustive(pkg, state);
-				if (ex != null)
-					return ex;
+				var percent = 0.05d;
+				while (percent > 0)
+				{
+					var ex = GetNext_Exhaustive(pkg, state, percent);
+					if (ex != null)
+						return ex;
+					else
+					{
+						percent -= 0.01d;
+						Console.WriteLine($"Increasing exhaustive granularity to: {(1-percent):P0}");
+					}
+				}
 			}
 
 			Console.WriteLine("SOMETHING WENT TERRIBLY WRONG!! ABORT MISSION");
@@ -69,23 +78,28 @@ namespace DotNet
 			}
 			else
 			{
-				Console.WriteLine("Could not find target (greedy)");
+				//Console.WriteLine("Could not find target (greedy)");
 				return null;
 			}
 		}
 
-		private PointPackage GetNext_Exhaustive(Package pkg, GameState state)
+		private PointPackage GetNext_Exhaustive(Package pkg, GameState state, double percent = 0.05d)
 		{
 			Console.WriteLine($"GetNext_Exhaustive Package={pkg}");
 			var maxX = state.Vehicle.Width - pkg.Width;
 			var maxY = state.Vehicle.Length - pkg.Length;
 			var maxZ = state.Vehicle.Height - pkg.Height;
 
-			for (var y = 0; y < maxY; y++)
+			var incX = Math.Min(5, (int)Math.Round(maxX * percent));
+			var incY = Math.Min(5, (int)Math.Round(maxX * percent));
+			var incZ = Math.Min(5, (int)Math.Round(maxX * percent));
+
+			for (var y = 0; y < maxY; y += incY)
 			{
-				for (var x = 0; x < maxX; x++)
+				Console.WriteLine($"Exhaustive Y={y}, X={0}, Z={0}");
+				for (var x = 0; x < maxX; x += incX)
 				{
-					for (var z = 0; z < maxZ; z++)
+					for (var z = 0; z < maxZ; z += incZ)
 					{
 						var target = pkg.Place(x, y, z);
 						var valid = state.IsValidPlacement(target);

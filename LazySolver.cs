@@ -1,6 +1,7 @@
 ﻿using DotNet.Core;
 using DotNet.models;
 using System;
+using System.Collections.Generic;
 using System.Linq;
 
 namespace DotNet
@@ -60,29 +61,20 @@ namespace DotNet
 		{
 			var prev = previous?.AsBox() ?? new Box();
 
-			var aboveLast = pkg.Place(prev.Min.X, prev.Min.Y, prev.Max.Z + 1);
-			var newStackOnTheRight = pkg.Place(prev.Max.X + 1, prev.Min.Y, 0);
-			var leftMostOfLastOnNextRow = pkg.Place(0, prev.Max.Y + 1, prev.Min.Z);
-			var inFrontOfLast = pkg.Place(prev.Max.X + 1, prev.Max.Y + 1, 0);
+			var aboveLast = pkg.PlaceAllVariants(prev.Min.X, prev.Min.Y, prev.Max.Z + 1);
+			var newStackOnTheRight = pkg.PlaceAllVariants(prev.Max.X + 1, prev.Min.Y, 0);
+			var leftMostOfLastOnNextRow = pkg.PlaceAllVariants(0, prev.Max.Y + 1, prev.Min.Z);
+			var inFrontOfLast = pkg.PlaceAllVariants(prev.Max.X + 1, prev.Max.Y + 1, 0);
 
 
-			var alternatives = new[]
-			{
-					//pkg.Place(_xStart, _yStart, _zStart),
-					//pkg.Place(_xStart, _yEnd, _zEnd),
-					//pkg.Place(_xEnd, _yStart, _zStart),
-					//pkg.Place(_xEnd, _yEnd, _zStart),
-					//pkg.Place(_xEnd, _yStart, _zEnd),
-					//pkg.Place(_xEnd, _yEnd, _zEnd),
-
-					aboveLast,
-					newStackOnTheRight,
-					leftMostOfLastOnNextRow,
-					inFrontOfLast,
-				};
+			var alternatives = new List<PointPackage>();
+			alternatives.AddRange(aboveLast);
+			alternatives.AddRange(newStackOnTheRight);
+			alternatives.AddRange(leftMostOfLastOnNextRow);
+			alternatives.AddRange(inFrontOfLast);
 
 			// Validate
-			alternatives = alternatives.Where(p => state.IsValidPlacement(p)).ToArray();
+			alternatives = alternatives.Where(p => state.IsValidPlacement(p)).ToList();
 
 			// todo: randomize order?
 

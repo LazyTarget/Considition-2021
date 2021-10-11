@@ -35,6 +35,8 @@ namespace DotNet.Core
 
 				History.Add(pkg);
 				solution.Add(pkg);
+
+				Console.WriteLine($"Package placed!!! \t\t\t\t{pkg}");
 			}
 			return solution;
 		}

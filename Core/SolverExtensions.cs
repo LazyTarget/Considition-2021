@@ -99,8 +99,25 @@ namespace DotNet.Core
             }
         }
 
+        public static Point3D GetDimensions(this Package pkg)
+		{
+            var max = new Point3D
+            {
+                X = pkg.Width,
+                Y = pkg.Length,
+                Z = pkg.Height,
+            };
+            return max;
+        }
+
         public static PointPackage Place(this Package package, int x, int y, int z)
 		{
+            var dimensions = package.GetDimensions();
+            return PlaceWithDimensions(package, x, y, z, dimensions);
+        }
+
+        public static PointPackage PlaceWithDimensions(this Package package, int x, int y, int z, Point3D dimensions)
+        {
             var placedPackage = new PointPackage
             {
                 Id = package.Id,
@@ -108,30 +125,40 @@ namespace DotNet.Core
                 x2 = x,
                 x3 = x,
                 x4 = x,
-                x5 = x + package.Length,
-                x6 = x + package.Length,
-                x7 = x + package.Length,
-                x8 = x + package.Length,
+                x5 = x + dimensions.X,
+                x6 = x + dimensions.X,
+                x7 = x + dimensions.X,
+                x8 = x + dimensions.X,
                 y1 = y,
                 y2 = y,
                 y3 = y,
                 y4 = y,
-                y5 = y + package.Width,
-                y6 = y + package.Width,
-                y7 = y + package.Width,
-                y8 = y + package.Width,
+                y5 = y + dimensions.Y,
+                y6 = y + dimensions.Y,
+                y7 = y + dimensions.Y,
+                y8 = y + dimensions.Y,
                 z1 = z,
                 z2 = z,
                 z3 = z,
                 z4 = z,
-                z5 = z + package.Height,
-                z6 = z + package.Height,
-                z7 = z + package.Height,
-                z8 = z + package.Height,
+                z5 = z + dimensions.Z,
+                z6 = z + dimensions.Z,
+                z7 = z + dimensions.Z,
+                z8 = z + dimensions.Z,
                 OrderClass = package.OrderClass,
                 WeightClass = package.WeightClass
             };
             return placedPackage;
+        }
+
+        public static IEnumerable<PointPackage> PlaceAllVariants(this Package package, int x, int y, int z)
+        {
+            yield return PlaceWithDimensions(package, x, y, z, new Point3D { X = package.Width, Y = package.Length, Z = package.Height });
+            yield return PlaceWithDimensions(package, x, y, z, new Point3D { X = package.Length, Y = package.Width, Z = package.Height });
+            yield return PlaceWithDimensions(package, x, y, z, new Point3D { X = package.Width, Y = package.Height, Z = package.Length });
+            yield return PlaceWithDimensions(package, x, y, z, new Point3D { X = package.Height, Y = package.Length, Z = package.Width});
+            yield return PlaceWithDimensions(package, x, y, z, new Point3D { X = package.Length, Y = package.Height, Z = package.Width });
+            yield return PlaceWithDimensions(package, x, y, z, new Point3D { X = package.Height, Y = package.Width, Z = package.Length });
         }
 
         public static IEnumerable<int> GetValuesForX(this PointPackage package)
@@ -212,12 +239,13 @@ namespace DotNet.Core
                 Z = 0,
             };
 
-            var max = new Point3D
-            {
-                X = pkg.Width,
-                Y = pkg.Length,
-                Z = pkg.Height,
-            };
+            //var max = new Point3D
+            //{
+            //    X = pkg.Width,
+            //    Y = pkg.Length,
+            //    Z = pkg.Height,
+            //};
+            var max = pkg.GetDimensions();
 
             var box = new Box
             {

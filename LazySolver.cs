@@ -61,10 +61,10 @@ namespace DotNet
 		{
 			var prev = previous?.AsBox() ?? new Box();
 
-			var aboveLast = pkg.PlaceAllVariants(prev.Min.X, prev.Min.Y, prev.Max.Z + 1);
-			var newStackOnTheRight = pkg.PlaceAllVariants(prev.Max.X + 1, prev.Min.Y, 0);
-			var leftMostOfLastOnNextRow = pkg.PlaceAllVariants(0, prev.Max.Y + 1, prev.Min.Z);
-			var inFrontOfLast = pkg.PlaceAllVariants(prev.Max.X + 1, prev.Max.Y + 1, 0);
+			var aboveLast = pkg.PlaceAllVariants(prev.Min.X, prev.Min.Y, prev.Max.Z);
+			var newStackOnTheRight = pkg.PlaceAllVariants(prev.Max.X, prev.Min.Y, 0);
+			var leftMostOfLastOnNextRow = pkg.PlaceAllVariants(0, prev.Max.Y, prev.Min.Z);
+			var inFrontOfLast = pkg.PlaceAllVariants(prev.Max.X, prev.Max.Y, 0);
 
 
 			var alternatives = new List<PointPackage>();

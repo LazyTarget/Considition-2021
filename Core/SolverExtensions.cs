@@ -17,11 +17,13 @@ namespace DotNet.Core
         /// <returns></returns>
 		public static bool ValidateTruckPosition(this Vehicle vehicle, PointPackage pkg)
         {
+            var margin = 1;
+
             // Width (X)
             var x = pkg.GetValuesForX().ToArray();
             if (x.Any(_ => _ < 0))
                 return false;
-            if (x.Any(_ => _ > vehicle.Width))
+            if (x.Any(_ => _ > vehicle.Width - margin))
                 return false;
 
 
@@ -29,7 +31,7 @@ namespace DotNet.Core
             var y = pkg.GetValuesForY().ToArray();
             if (y.Any(_ => _ < 0))
                 return false;
-            if (y.Any(_ => _ > vehicle.Length))
+            if (y.Any(_ => _ > vehicle.Length - margin))
                 return false;
 
 
@@ -37,7 +39,7 @@ namespace DotNet.Core
             var z = pkg.GetValuesForZ().ToArray();
             if (z.Any(_ => _ < 0))
                 return false;
-            if (z.Any(_ => _ > vehicle.Height))
+            if (z.Any(_ => _ > vehicle.Height - margin))
                 return false;
 
 

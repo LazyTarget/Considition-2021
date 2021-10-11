@@ -7,43 +7,63 @@ namespace DotNet
 {
 	public class LazySolver : SolverBase
 	{
-		private PointPackage _previous;
-
 		public override PointPackage GetNext(GameState state)
 		{
+			var prev = History.LastOrDefault();
+			var prevY = prev?.AsBox().Min.Y ?? 0;
 			var query = state.GetRemainingPackages(x => 0 - x.WeightClass, x => 0 - (x.Width * x.Length * x.Height)).ToList();
 			foreach (var pkg in query)
 			{
-				var greedy = GetNext_Greedy(pkg, state);
+				var greedy = GetNext_GreedyBasedOnPrevious(pkg, prev, state);
 				if (greedy != null)
 					return greedy;
 
-				var percent = 0.05d;
+				// try with the second most previous, if not Zero
+				PointPackage prePrev = null;
+				if (History.Count > 1 && (prePrev = History.Reverse().Skip(1).FirstOrDefault()) != null)
+				{
+					if (prePrev.AsBox().Max != Point3D.Zero)
+					{
+						greedy = GetNext_GreedyBasedOnPrevious(pkg, prePrev, state);
+						if (greedy != null)
+							return greedy;
+					}
+				}
+
+				var percent = 0.04d;
 				while (percent > 0)
 				{
-					var ex = GetNext_Exhaustive(pkg, state, percent);
+					var ex = GetNext_Exhaustive(pkg, state, prePrev?.AsBox().Min.Y ?? prevY, percent);
 					if (ex != null)
 						return ex;
 					else
 					{
-						percent -= 0.01d;
+						percent -= 0.02d;
 						Console.WriteLine($"Increasing exhaustive granularity to: {(1-percent):P0}");
 					}
 				}
 			}
 
+
+			// Last fallback!
+			query = state.GetRemainingPackages(x => 0 - x.WeightClass, x => 0 - (x.Width * x.Length * x.Height)).ToList();
+			var nextPkg = query.First();
+			var nex = GetNext_Exhaustive(nextPkg, state, 0, 0.01d);
+			if (nex != null)
+				return nex;
+
 			Console.WriteLine("SOMETHING WENT TERRIBLY WRONG!! ABORT MISSION");
 			return null;
 		}
 
-		private PointPackage GetNext_Greedy(Package pkg, GameState state)
+		private PointPackage GetNext_GreedyBasedOnPrevious(Package pkg, PointPackage previous, GameState state)
 		{
-			var prev = _previous?.AsBox() ?? new Box();
+			var prev = previous?.AsBox() ?? new Box();
 
-			var aboveLast = pkg.Place(prev.Min.X + 1, prev.Min.Y, prev.Max.Z);
-			var rightOfLast = pkg.Place(prev.Max.X + 1, prev.Min.Y, prev.Min.Z);
+			var aboveLast = pkg.Place(prev.Min.X, prev.Min.Y, prev.Max.Z + 1);
+			var newStackOnTheRight = pkg.Place(prev.Max.X + 1, prev.Min.Y, 0);
 			var leftMostOfLastOnNextRow = pkg.Place(0, prev.Max.Y + 1, prev.Min.Z);
-			var inFrontOfLast = pkg.Place(prev.Min.X, prev.Max.Y + 1, prev.Min.Z);
+			var inFrontOfLast = pkg.Place(prev.Max.X + 1, prev.Max.Y + 1, 0);
 
 
 			var alternatives = new[]
@@ -56,7 +76,7 @@ namespace DotNet
 					//pkg.Place(_xEnd, _yEnd, _zEnd),
 
 					aboveLast,
-					rightOfLast,
+					newStackOnTheRight,
 					leftMostOfLastOnNextRow,
 					inFrontOfLast,
 				};
@@ -73,7 +93,6 @@ namespace DotNet
 			var chosen = alternatives.FirstOrDefault();
 			if (chosen != null)
 			{
-				_previous = chosen;
 				return chosen;
 			}
 			else
@@ -83,7 +102,7 @@ namespace DotNet
 			}
 		}
 
-		private PointPackage GetNext_Exhaustive(Package pkg, GameState state, double percent = 0.05d)
+		private PointPackage GetNext_Exhaustive(Package pkg, GameState state, int prevY = 0, double percent = 0.05d)
 		{
 			Console.WriteLine($"GetNext_Exhaustive Package={pkg}");
 			var maxX = state.Vehicle.Width - pkg.Width;
@@ -94,7 +113,7 @@ namespace DotNet
 			var incY = Math.Min(5, (int)Math.Round(maxX * percent));
 			var incZ = Math.Min(5, (int)Math.Round(maxX * percent));
 
-			for (var y = 0; y < maxY; y += incY)
+			for (var y = prevY; y < maxY; y += incY)
 			{
 				Console.WriteLine($"Exhaustive Y={y}, X={0}, Z={0}");
 				for (var x = 0; x < maxX; x += incX)

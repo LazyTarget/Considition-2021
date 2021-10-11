@@ -46,12 +46,19 @@ namespace DotNet
 			}
 
 
-			// Last fallback!
+			// Fallback
 			query = state.GetRemainingPackages(x => 0 - x.WeightClass, x => 0 - (x.Width * x.Length * x.Height)).ToList();
 			var nextPkg = query.First();
 			var nex = GetNext_Exhaustive(nextPkg, state, 0, 0.01d);
 			if (nex != null)
 				return nex;
+
+			// Last fallback!
+			if (History.Any())
+			{
+				History.Clear();
+				return GetNext(state);
+			}
 
 			Console.WriteLine("SOMETHING WENT TERRIBLY WRONG!! ABORT MISSION");
 			return null;
